@@ -24,7 +24,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
+} from "@/lib/react-table-wrapper";
 
 interface Label {
   _id: string;

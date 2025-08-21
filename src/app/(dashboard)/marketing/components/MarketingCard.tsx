@@ -1,79 +1,67 @@
-import React from "react";
-import Style from "../../../styles/NewReleaseItem.module.css";
-import Link from "next/link";
-import Image from "next/image";
+import React from 'react';
 
-interface NewReleaseItemProps {
+interface MarketingCardProps {
+  albumId: string;
   imageSrc: string;
   albumName: string;
   albumArtist: string;
-  albumId: string;
-  status: string; 
+  status: string;
 }
 
-
-const MarketingCard: React.FC<NewReleaseItemProps> = ({
+const MarketingCard: React.FC<MarketingCardProps> = ({
+  albumId,
   imageSrc,
   albumName,
   albumArtist,
-  albumId,
   status,
 }) => {
+  const [imageError, setImageError] = React.useState(false);
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
-  let label = "Unknown";
-  let color = "yellow"; // Default values
-
-  switch (status) {
-    case "Pitched":
-      label = "Pitched";
-      color = "yellow";
-      break;
-    case "Selected":
-      label = "Selected";
-      color = "green";
-      break;
-    case "Not Pitched":
-      label = "Not Pitched";
-      color = "red";
-      break;
-    case "Requested":
-      label = "Requested";
-      color = "blue";
-      break;
-  }
+  const getStatusColor = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'selected':
+        return 'bg-green-100 text-green-800';
+      case 'requested':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'pitched':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
-    <div className={`border m-2 ${Style.newReleaseItem}`}>
-      <Link href={`/marketing/details/${btoa(albumId)}`}>
-        <Image
-          src={imageSrc}
-          alt="album"
-          width={200}
-          height={200}
-          className={Style.albumImage}
-        />
-        <div className="p-1">
-          <p className={`m-0 ${Style.albumName}`}>
-            {albumName && albumName.length > 15 ? `${albumName.slice(0, 12)}...` : albumName || 'Unknown Album'}
-          </p>
-          <p className={`m-0 ${Style.albumArtistName}`}>
-            {albumArtist && albumArtist.length > 10 ? `${albumArtist.slice(0, 10)}...` : albumArtist || 'Unknown Artist'}
-          </p>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 m-2 w-64">
+      <div className="relative h-48 bg-gray-200">
+        {!imageError ? (
+          <img
+            src={imageSrc}
+            alt={albumName}
+            className="w-full h-full object-cover"
+            onError={handleImageError}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-300">
+            <span className="text-gray-500 text-sm">No Image</span>
+          </div>
+        )}
+        <div className="absolute top-2 right-2">
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(status)}`}>
+            {status || 'Unknown'}
+          </span>
         </div>
-      </Link>
-
-      {/* Handle Tailwind CSS dynamic classes */}
-      <div
-        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium 
-        ${color === "purple" ? "bg-purple-50 text-purple-700 ring-purple-600/10" : ""}
-        ${color === "blue" ? "bg-blue-50 text-blue-700 ring-blue-600/10" : ""}
-        ${color === "green" ? "bg-green-50 text-green-700 ring-green-600/10" : ""}
-        ${color === "red" ? "bg-red-50 text-red-700 ring-red-600/10" : ""}
-        ${color === "yellow" ? "bg-yellow-50 text-yellow-700 ring-yellow-600/10" : ""}
-        ring-1 ring-inset ${Style.albumStatusBadge} `}
-      >
-        {label}
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-lg text-gray-900 truncate" title={albumName}>
+          {albumName || 'Unknown Album'}
+        </h3>
+        <p className="text-gray-600 text-sm truncate" title={albumArtist}>
+          {albumArtist || 'Unknown Artist'}
+        </p>
       </div>
     </div>
   );

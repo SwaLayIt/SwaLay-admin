@@ -24,9 +24,11 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MessageCircle, Eye } from "lucide-react";
 
-export type supportData = {
+export type SupportTicket = {
     name: string;
     email: string;
     subject: string;
@@ -35,7 +37,7 @@ export type supportData = {
     _id: string;
     ticketId: string;
     __v: number;
-    status: string;
+    status: "pending" | "in-progress" | "resolved";
     priority: 'low' | 'medium' | 'high';
     isClosed: boolean;
     replies?: any[];
@@ -44,7 +46,15 @@ export type supportData = {
     createdAt: string;
 };
 
-export const supportColumns: ColumnDef<supportData>[] = [
+interface SupportDataTableProps {
+    data: SupportTicket[];
+    onViewThread?: (ticketId: string) => void;
+    className?: string;
+}
+
+export const supportColumns = (
+    onViewThread?: (ticketId: string) => void
+): ColumnDef<SupportTicket>[] => [
     {
         accessorKey: "srno",
         header: "Sr No",
@@ -55,38 +65,37 @@ export const supportColumns: ColumnDef<supportData>[] = [
         header: "Ticket ID",
         cell: ({ row }) => {
             const data = row.original;
-            return <div className="ms-2">#{data.ticketId}</div>;
-        },
-    },
-    {
-        accessorKey: "name",
-        header: "Name",
-        cell: ({ row }) => {
-            const data = row.original;
             return (
-                <div className="ms-2">
-                    {data.labelId ? (
-                        <a 
-                            href={`/labels/${btoa(data.labelId)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline text-blue-600"
-                        >
-                            {data.name}
-                        </a>
-                    ) : (
-                        data.name
-                    )}
+                <div className="font-medium">
+                    #{data.ticketId}
                 </div>
             );
         },
     },
     {
-        accessorKey: "email",
-        header: "Email",
+        accessorKey: "name",
+        header: "Customer",
         cell: ({ row }) => {
             const data = row.original;
-            return <div className="ms-2">{data.email}</div>;
+            return (
+                <div className="space-y-1">
+                    <div className="font-medium">
+                        {data.labelId ? (
+                            <a 
+                                href={`/labels/${btoa(data.labelId)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline text-blue-600"
+                            >
+                                {data.name}
+                            </a>
+                        ) : (
+                            data.name
+                        )}
+                    </div>
+                    <div className="text-sm text-gray-500">{data.email}</div>
+                </div>
+            );
         },
     },
     {
@@ -94,7 +103,12 @@ export const supportColumns: ColumnDef<supportData>[] = [
         header: "Subject",
         cell: ({ row }) => {
             const data = row.original;
-            return <div className="ms-2">{data.subject}</div>;
+            return (
+                <div className="max-w-[200px]">
+                    <div className="font-medium truncate">{data.subject}</div>
+                    <div className="text-sm text-gray-500 truncate">{data.message}</div>
+                </div>
+            );
         },
     },
     {
@@ -137,8 +151,8 @@ export const supportColumns: ColumnDef<supportData>[] = [
         cell: ({ row }) => {
             const data = row.original;
             return (
-                <div className="ms-2 flex items-center gap-2">
-                    <span>{data.replyCount || 0}</span>
+                <div className="flex items-center gap-2">
+                    <span className="text-sm">{data.replyCount || 0}</span>
                     {data.unreadReplies && data.unreadReplies > 0 && (
                         <Badge className="bg-red-500 text-white text-xs">
                             {data.unreadReplies > 9 ? '9+' : data.unreadReplies}
@@ -150,7 +164,7 @@ export const supportColumns: ColumnDef<supportData>[] = [
     },
     {
         accessorKey: "isClosed",
-        header: "Status",
+        header: "State",
         cell: ({ row }) => {
             const data = row.original;
             return (
@@ -165,20 +179,70 @@ export const supportColumns: ColumnDef<supportData>[] = [
         header: "Created",
         cell: ({ row }) => {
             const data = row.original;
-            return <div className="ms-2">{new Date(data.createdAt).toLocaleDateString()}</div>;
+            return (
+                <div className="text-sm text-gray-500">
+                    {new Date(data.createdAt).toLocaleDateString()}
+                </div>
+            );
+        },
+    },
+    {
+        id: "actions",
+        header: "Actions",
+        cell: ({ row }) => {
+            const data = row.original;
+
+            return (
+                <div className="flex items-center gap-2">
+                    {onViewThread && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onViewThread(data.ticketId)}
+                            className="relative"
+                        >
+                            <Eye className="h-4 w-4 mr-1" />
+                            View
+                            {data.unreadReplies && data.unreadReplies > 0 && (
+                                <div 
+                                    className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center"
+                                >
+                                    {data.unreadReplies > 9 ? "9+" : data.unreadReplies}
+                                </div>
+                            )}
+                        </Button>
+                    )}
+                </div>
+            );
         },
     },
 ];
 
-export function SupportDataTable({ data }: { data: supportData[] }) {
+export function SupportDataTable({ 
+    data, 
+    onViewThread,
+    className = ""
+}: SupportDataTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+    const [globalFilter, setGlobalFilter] = React.useState("");
+    const [statusFilter, setStatusFilter] = React.useState<string>("all");
+
+    const columns = supportColumns(onViewThread);
+
+    // Filter data based on status filter
+    const filteredData = React.useMemo(() => {
+        if (statusFilter === "all") {
+            return data;
+        }
+        return data.filter((ticket) => ticket.status === statusFilter);
+    }, [data, statusFilter]);
 
     const table = useReactTable({
-        data,
-        columns: supportColumns,
+        data: filteredData,
+        columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -187,16 +251,60 @@ export function SupportDataTable({ data }: { data: supportData[] }) {
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
+        onGlobalFilterChange: setGlobalFilter,
+        globalFilterFn: (row, columnId, filterValue) => {
+            const searchValue = filterValue.toLowerCase();
+            const name = row.getValue("name")?.toString().toLowerCase() || "";
+            const email = row.original.email?.toLowerCase() || "";
+            const subject = row.getValue("subject")?.toString().toLowerCase() || "";
+            const ticketId = row.getValue("ticketId")?.toString().toLowerCase() || "";
+            
+            return name.includes(searchValue) || 
+                   email.includes(searchValue) || 
+                   subject.includes(searchValue) || 
+                   ticketId.includes(searchValue);
+        },
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             rowSelection,
+            globalFilter,
+        },
+        initialState: {
+            pagination: {
+                pageSize: 50,
+            },
         },
     });
 
     return (
-        <div className="w-full">
+        <div className={`w-full ${className}`}>
+            <div className="flex items-center justify-between py-4">
+                <div className="flex items-center gap-4">
+                    <Input
+                        placeholder="Search tickets..."
+                        value={globalFilter ?? ""}
+                        onChange={(event) => setGlobalFilter(event.target.value)}
+                        className="max-w-sm"
+                    />
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All Status</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="in-progress">In Progress</SelectItem>
+                            <SelectItem value="resolved">Resolved</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                    Showing {table.getFilteredRowModel().rows.length} of {data.length} tickets
+                </div>
+            </div>
+            
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -205,11 +313,9 @@ export function SupportDataTable({ data }: { data: supportData[] }) {
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead key={header.id}>
-                                            <div className="ms-1">
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(header.column.columnDef.header, header.getContext())}
-                                            </div>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     );
                                 })}
@@ -219,7 +325,11 @@ export function SupportDataTable({ data }: { data: supportData[] }) {
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                                <TableRow 
+                                    key={row.id} 
+                                    data-state={row.getIsSelected() && "selected"}
+                                    className="hover:bg-gray-50"
+                                >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -229,15 +339,16 @@ export function SupportDataTable({ data }: { data: supportData[] }) {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={supportColumns.length} className="h-24 text-center">
-                                    No results.
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    No tickets found.
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
+            
+            <div className="flex items-center justify-between space-x-2 py-4">
                 <div className="flex-1 text-sm text-muted-foreground">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}
                     {table.getFilteredRowModel().rows.length} row(s) selected.

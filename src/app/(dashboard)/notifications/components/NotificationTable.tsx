@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef } from "@/lib/react-table-wrapper";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { apiGet, apiPost } from "@/helpers/axiosRequest";

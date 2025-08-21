@@ -33,7 +33,8 @@ export async function apiFetch<T = any>(
 
   try {
     const config: RequestInit = {
-      cache: "no-store",
+      // Use force-cache for static generation, no-store for dynamic rendering
+      cache: options.cache || (process.env.NODE_ENV === 'production' ? 'force-cache' : 'no-store'),
       ...options,
       headers: {
         ...defaultHeaders,

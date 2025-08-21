@@ -35,16 +35,22 @@ interface ApiResponse {
   data: Album[];
 }
 
-// Create a fetcher function for SWR
-
+// Force dynamic rendering to prevent static generation issues
+export const dynamic = 'force-dynamic';
 
 const Page = async () => {
- 
- const response = await api.get<ApiResponse>("/api/marketing/fetchAlbumBymarketing");
- console.log("marketing data response");
- console.log(response.data);
- const marketingData = response.data;
-
+  let marketingData: Album[] = [];
+  
+  try {
+    const response = await api.get<ApiResponse>("/api/marketing/fetchAlbumBymarketing");
+    console.log("marketing data response");
+    console.log(response.data);
+    marketingData = response.data || [];
+  } catch (error) {
+    console.error("Error fetching marketing data:", error);
+    // Return empty array on error to prevent build failure
+    marketingData = [];
+  }
 
   return (
     <div className="w-full min-h-screen p-6 bg-white rounded-sm">
@@ -75,7 +81,6 @@ const Page = async () => {
             status={album.marketingStatus}
           />
         ))}
-
       </div>
     </div>
   );

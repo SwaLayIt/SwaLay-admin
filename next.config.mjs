@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  
   images: {
     remotePatterns: [
       {
@@ -8,7 +7,6 @@ const nextConfig = {
         hostname: "swalay-music-files.s3.ap-south-1.amazonaws.com",
         pathname: "/**",
       },
-
       {
         protocol: "https",
         hostname: "swalay-test-files.s3.ap-south-1.amazonaws.com",
@@ -16,11 +14,37 @@ const nextConfig = {
       },
     ],
   },
-  //   eslint: {
-  //     ignoreDuringBuilds: true,
-  // },
+  
+  // Increase build timeout
+  staticPageGenerationTimeout: 120,
 
-    async headers() {
+  // Remove transpilePackages since we're not using @tanstack/react-table anymore
+  // transpilePackages: ['@tanstack/react-table'],
+
+  // Optimize webpack for better build performance
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Increase memory limit for server-side builds
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          cacheGroups: {
+            ...config.optimization.splitChunks.cacheGroups,
+            default: {
+              minChunks: 1,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      };
+    }
+
+    return config;
+  },
+
+  async headers() {
     return [
       {
         source: '/api/albums/getAlbums',
@@ -75,10 +99,6 @@ const nextConfig = {
 
     ];
   }
-
-
-
-
 };
 
 export default nextConfig;

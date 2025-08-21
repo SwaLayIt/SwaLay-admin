@@ -3,11 +3,16 @@ import { connect } from '@/dbConfig/dbConfig';
 import Support from '@/models/Support';
 import SupportReply from '@/models/SupportReply';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     await connect();
 
-    const tickets = await Support.aggregate([
+    // Get the URL and search params
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+
+    // Build the aggregation pipeline
+    const aggregationPipeline: any[] = [
       {
         $addFields: {
           statusOrder: {
@@ -21,9 +26,20 @@ export async function GET() {
             }
           }
         }
-      },
-      { $sort: { statusOrder: 1, createdAt: -1 } }
-    ]);
+      }
+    ];
+
+    // Add status filter if provided
+    if (status && status !== 'all') {
+      aggregationPipeline.unshift({
+        $match: { status: status }
+      });
+    }
+
+    // Add sorting
+    aggregationPipeline.push({ $sort: { statusOrder: 1, createdAt: -1 } });
+
+    const tickets = await Support.aggregate(aggregationPipeline);
 
     // Get replies for each ticket
     const ticketsWithReplies = await Promise.all(
@@ -48,7 +64,10 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       status: 200,
-      data: ticketsWithReplies
+      data: ticketsWithReplies,
+      filters: {
+        status: status || 'all'
+      }
     });
 
   } catch (error) {

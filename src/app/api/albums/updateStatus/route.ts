@@ -87,12 +87,6 @@ export async function POST(req: NextRequest) {
 
     const userEmail = user?.email;
 
-    const albumStatusTemplate = AlbumStatusEmailTemplate({
-      labelName: user?.username || "",
-      albumName,
-      status: statusLabel as "approved" | "rejected" | "live",
-      message,
-    });
     const emailTemplate = React.createElement(EmailLayout, {
       children: React.createElement(AlbumStatusEmailTemplate, {
         labelName: user?.username || "",

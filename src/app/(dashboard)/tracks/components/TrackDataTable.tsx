@@ -3,13 +3,16 @@
 import * as React from "react";
 import {
   ColumnDef,
+  ColumnFiltersState,
   SortingState,
-  useReactTable,
+  VisibilityState,
+  flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  flexRender,
-} from "@tanstack/react-table";
+  useReactTable,
+} from "@/lib/react-table-wrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {

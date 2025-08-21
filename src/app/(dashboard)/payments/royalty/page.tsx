@@ -15,6 +15,8 @@ import toast from "react-hot-toast";
 import { useDropzone } from "react-dropzone";
 import PaymentList from "../components/PaymentList";
 import RoyaltyLabelList from "../components/RoyaltyLabelList";
+import Link from "next/link";
+
 
 interface LabelData {
   _id: string;
@@ -49,7 +51,6 @@ const RoyaltyPage = () => {
         formData.append("payout_report_url", pdfFile);
       }
 
-
       // Use the apiFormData helper function
       const response = await apiFormData("/api/payments/addPayment", formData);
 
@@ -73,7 +74,8 @@ const RoyaltyPage = () => {
 
   const fetchLabels = async () => {
     try {
-      const response: { success: boolean; data: LabelData[] } | null = await apiGet("/api/labels/getLabels");
+      const response: { success: boolean; data: LabelData[] } | null =
+        await apiGet("/api/labels/getLabels");
       if (response && response.success) {
         setLabelData(response.data);
       }
@@ -146,7 +148,18 @@ const RoyaltyPage = () => {
         <h3 className="text-3xl font-bold mb-2 text-blue-500">
           All Labels for royalty
         </h3>
-        <Button onClick={() => setIsModalVisible(true)}>Add New Royalty</Button>
+        <div>
+          <Link
+            href="/payments/royalty/upload-data"
+            className="inline-flex items-center px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors me-3"
+          >
+            Upload Royalty Data
+          </Link>
+
+          <Button onClick={() => setIsModalVisible(true)}>
+            Add New Royalty
+          </Button>
+        </div>
       </div>
 
       {/* {payoutRequestData && <PaymentPendingList data={payoutRequestData} />} */}

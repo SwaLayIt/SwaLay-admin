@@ -13,7 +13,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table";
+} from "@/lib/react-table-wrapper";
 
 import { Button } from "@/components/ui/button";
 
