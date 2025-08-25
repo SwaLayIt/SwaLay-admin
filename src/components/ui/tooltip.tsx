@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
+import PropTypes from "prop-types"
 
 import { cn } from "@/lib/utils"
 
@@ -27,6 +28,12 @@ const TooltipContent = React.forwardRef<
     />
   </TooltipPrimitive.Portal>
 ))
+
+TooltipContent.propTypes = {
+  className: PropTypes.string,
+  sideOffset: PropTypes.number,
+}
+
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }

@@ -51,51 +51,60 @@ const DocumentationSection: React.FC<DocumentationSectionProps> = ({
   const [ndaFileName, setNdaFileName] = useState<string | null>(null);
   const [workPolicyFileName, setWorkPolicyFileName] = useState<string | null>(null);
 
+
+
   // Load existing data if in edit mode
   useEffect(() => {
+
+    const loadDocumentation = async () => {
+      try {
+        setLoading(true);
+        const response = await apiGet(`/api/employee/documentation?employeeId=${employeeId}`) as any;
+        
+        if (response.success && response.data) {
+          const data = response.data;
+          setFormData({
+            employeeVerification: data.employeeVerification || "Pending",
+            ndaSignature: {
+              status: data.ndaSignature?.status || "Pending",
+              document: null,
+            },
+            workPolicy: {
+              status: data.workPolicy?.status || "Pending",
+              document: null,
+            },
+          });
+          
+          // Set existing file URLs and filenames if available
+          if (data.ndaSignature?.document) {
+            setExsitsNdaFile(data.ndaSignature.document);
+            setNdaFileName(data.ndaSignature.fileName || null);
+          }
+          if (data.workPolicy?.document) {
+            setExsitsWorkPolicy(data.workPolicy.document);
+            setWorkPolicyFileName(data.workPolicy.fileName || null);
+          }
+          
+          console.log("Loaded documentation:", data);
+        }
+      } catch (error) {
+        console.error("Error loading documentation:", error);
+        toast.error("Error loading documentation");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
+
+
     if (isEditMode && employeeId) {
       loadDocumentation();
     }
+
   }, [isEditMode, employeeId]);
 
-  const loadDocumentation = async () => {
-    try {
-      setLoading(true);
-      const response = await apiGet(`/api/employee/documentation?employeeId=${employeeId}`) as any;
-      
-      if (response.success && response.data) {
-        const data = response.data;
-        setFormData({
-          employeeVerification: data.employeeVerification || "Pending",
-          ndaSignature: {
-            status: data.ndaSignature?.status || "Pending",
-            document: null,
-          },
-          workPolicy: {
-            status: data.workPolicy?.status || "Pending",
-            document: null,
-          },
-        });
-        
-        // Set existing file URLs and filenames if available
-        if (data.ndaSignature?.document) {
-          setExsitsNdaFile(data.ndaSignature.document);
-          setNdaFileName(data.ndaSignature.fileName || null);
-        }
-        if (data.workPolicy?.document) {
-          setExsitsWorkPolicy(data.workPolicy.document);
-          setWorkPolicyFileName(data.workPolicy.fileName || null);
-        }
-        
-        console.log("Loaded documentation:", data);
-      }
-    } catch (error) {
-      console.error("Error loading documentation:", error);
-      toast.error("Error loading documentation");
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const handleInputChange = (field: keyof DocumentationFormData, value: string) => {
     setFormData(prev => ({

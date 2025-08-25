@@ -24,7 +24,7 @@ const Navbar = () => {
   
   const router = useRouter();
   const context = useContext(UserContext);
-  // const userType = context?.user?.usertype; // Get user type from context
+  //  const userType = context?.user?.usertype; // Get user type from context
   // const labelId = context?.user?._id; // If not used, consider removing
 
   // Paths allowed for each user type
@@ -32,6 +32,7 @@ const Navbar = () => {
     customerSupport: ["/", "/albums", "/albums/new-release", "/albums/all", "/albums/approved", "/albums/processing", "/albums/live", "/albums/rejected", "/copyrights", "/labels", "/support"],
     contentDeployment: ["/", "/albums", "/albums/new-release", "/albums/all", "/albums/approved", "/albums/processing", "/albums/live", "/albums/rejected", "/copyrights", "/artists", "/support"],
     ANR: ["/", "/albums", "/albums/new-release", "/albums/all", "/albums/approved", "/albums/processing", "/albums/live", "/albums/rejected", "/marketing", "/artists", "/notifications", "/payments", "/payments/royalty", "/payments/all", "/payments/pending", "/payments/approved"],
+    HR: ["/", "/employees"],
   };
 
   // Define all navigation items and their dropdowns
@@ -78,7 +79,7 @@ const Navbar = () => {
   // Filter menu items based on the user type
   const userType = context?.user?.usertype || ""; // Provide a default empty string if userType is undefined
 
-
+  console.log("userType", userType);
 
   const allowedPaths =
     roleAllowedPaths[userType as keyof typeof roleAllowedPaths] || [];

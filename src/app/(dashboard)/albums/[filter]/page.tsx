@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import React, { useContext, useEffect, useState, useCallback } from "react";
+import React, { useContext, useEffect, useState, useCallback, useMemo } from "react";
 
 import Style from "../../../styles/Albums.module.css";
 
@@ -35,7 +35,7 @@ const Albums = ({ params }: { params: { filter: string } }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isInvalidFilter, setIsInvalidFilter] = useState(false);
 
-  const validFilters = ["All", "Draft", "Processing", "Approved", "Rejected", "Live"];
+  const validFilters = useMemo(() => ["All", "Draft", "Processing", "Approved", "Rejected", "Live"], []);
 
   useEffect(() => {
     if (!validFilters.includes(filter)) {

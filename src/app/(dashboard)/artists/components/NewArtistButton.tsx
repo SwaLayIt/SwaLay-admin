@@ -1,7 +1,6 @@
 "use client";
-
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import ArtistModalForm from "@/components/ArtistModalForm";
 
 export default function NewArtistButton() {

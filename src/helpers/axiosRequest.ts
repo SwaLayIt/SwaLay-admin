@@ -26,7 +26,7 @@ export const apiRequest = async <TRequest = unknown, TResponse = unknown>({
   const baseUrl = getBaseUrl();
   const url = `${baseUrl}${endpoint}`;
   
-  console.log('Making request to:', url); // Debug log
+  // console.log('Making request to:', url); // Debug log
   
   const response = await axios({
     url: url, // Use full URL instead of relative

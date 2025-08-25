@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -53,29 +53,7 @@ const OfficialDetailsSection: React.FC<OfficialDetailsSectionProps> = ({
   });
   const [errors, setErrors] = useState<OfficialErrors>({});
 
-  // Load existing data if in edit mode
-  useEffect(() => {
-    if (isEditMode && employeeId) {
-      loadOfficialDetails();
-    }
-  }, [isEditMode, employeeId]);
-
-  // Fetch employee list for manager dropdown
-  useEffect(() => {
-    async function fetchEmployees() {
-      try {
-        const res = await apiGet("/api/employee/all") as { data: {_id: string, fullName: string}[] };
-        if (res && res.data) {
-          setEmployeeList(res.data);
-        }
-      } catch (e) { 
-        console.error("Error fetching employees:", e);
-      }
-    }
-    fetchEmployees();
-  }, []);
-
-  const loadOfficialDetails = async () => {
+  const loadOfficialDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiGet(`/api/employee/official-details?employeeId=${employeeId}`) as any;
@@ -100,7 +78,29 @@ const OfficialDetailsSection: React.FC<OfficialDetailsSectionProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [employeeId]);
+
+  // Load existing data if in edit mode
+  useEffect(() => {
+    if (isEditMode && employeeId) {
+      loadOfficialDetails();
+    }
+  }, [isEditMode, employeeId, loadOfficialDetails]);
+
+  // Fetch employee list for manager dropdown
+  useEffect(() => {
+    async function fetchEmployees() {
+      try {
+        const res = await apiGet("/api/employee/all") as { data: {_id: string, fullName: string}[] };
+        if (res && res.data) {
+          setEmployeeList(res.data);
+        }
+      } catch (e) { 
+        console.error("Error fetching employees:", e);
+      }
+    }
+    fetchEmployees();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;

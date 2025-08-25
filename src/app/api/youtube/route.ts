@@ -100,41 +100,36 @@ async function handleUpload(
     'Accept': 'application/json',
   };
 
-  try {
-    // Upload request
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(postData),
-    });
+  // Upload request
+  const uploadResponse = await fetch(uploadUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(postData),
+  });
 
-    if (!uploadResponse.ok) {
-      const errorData = await uploadResponse.json().catch(() => null);
-      throw new Error(`Upload failed: ${errorData?.error || uploadResponse.statusText}`);
-    }
-
-    const uploadData = await uploadResponse.json();
-
-    // Publish request
-    const publishResponse = await fetch(publishUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Accept': 'application/json',
-      },
-    });
-
-    if (!publishResponse.ok) {
-      const errorData = await publishResponse.json().catch(() => null);
-      throw new Error(`Publish failed: ${errorData?.error || publishResponse.statusText}`);
-    }
-
-    const publishData = await publishResponse.json();
-    return { uploadData, publishData };
-
-  } catch (error) {
-    throw error;
+  if (!uploadResponse.ok) {
+    const errorData = await uploadResponse.json().catch(() => null);
+    throw new Error(`Upload failed: ${errorData?.error || uploadResponse.statusText}`);
   }
+
+  const uploadData = await uploadResponse.json();
+
+  // Publish request
+  const publishResponse = await fetch(publishUrl, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiToken}`,
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!publishResponse.ok) {
+    const errorData = await publishResponse.json().catch(() => null);
+    throw new Error(`Publish failed: ${errorData?.error || publishResponse.statusText}`);
+  }
+
+  const publishData = await publishResponse.json();
+  return { uploadData, publishData };
 }
 
 // Helper function to extract video ID from YouTube URL
@@ -155,22 +150,18 @@ async function handleReleaseClaim(releaseData: ReleaseClaimRequest): Promise<Rel
     'Accept': 'application/json',
   };
 
-  try {
-    const response = await fetch(releaseUrl, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(releaseData),
-    });
+  const response = await fetch(releaseUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(releaseData),
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(`Release claim failed: ${errorData?.error || response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(`Release claim failed: ${errorData?.error || response.statusText}`);
   }
+
+  return await response.json();
 }
 
 // Define the API route handler

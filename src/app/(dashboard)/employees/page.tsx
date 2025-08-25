@@ -47,9 +47,6 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     try {
       const result:any = await apiGet("/api/employee/all")  
-
-      console.log("fetch employee result");
-      console.log(result.data);
       setEmployees(result.data);
       
     } catch (error) {

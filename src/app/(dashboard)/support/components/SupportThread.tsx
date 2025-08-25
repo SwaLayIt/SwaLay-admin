@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -46,19 +46,7 @@ export default function SupportThread({
   const [error, setError] = useState<string | null>(null);
   const hasMarkedAsRead = useRef(false);
 
-  useEffect(() => {
-    fetchReplies();
-  }, [ticketId]);
-
-  // Auto-mark replies as read when thread is opened (only once)
-  useEffect(() => {
-    if (replies.length > 0 && !hasMarkedAsRead.current) {
-      hasMarkedAsRead.current = true;
-      markAllRepliesAsRead();
-    }
-  }, [replies]);
-
-  const fetchReplies = async () => {
+  const fetchReplies = useCallback(async () => {
     try {
       setLoading(true);
       hasMarkedAsRead.current = false; // Reset flag when fetching new replies
@@ -82,9 +70,9 @@ export default function SupportThread({
     } finally {
       setLoading(false);
     }
-  };
+  }, [ticketId]);
 
-  const markAllRepliesAsRead = async () => {
+  const markAllRepliesAsRead = useCallback(async () => {
     try {
       // Get all unread user replies
       const unreadUserReplies = replies.filter(
@@ -115,7 +103,19 @@ export default function SupportThread({
     } catch (error) {
       console.error("Error marking replies as read:", error);
     }
-  };
+  }, [replies, onUpdate]);
+
+  useEffect(() => {
+    fetchReplies();
+  }, [fetchReplies]);
+
+  // Auto-mark replies as read when thread is opened (only once)
+  useEffect(() => {
+    if (replies.length > 0 && !hasMarkedAsRead.current) {
+      hasMarkedAsRead.current = true;
+      markAllRepliesAsRead();
+    }
+  }, [replies, markAllRepliesAsRead]);
 
   const handleSendReply = async () => {
     if (!newMessage.trim()) return;
@@ -483,3 +483,5 @@ export default function SupportThread({
     </div>
   );
 }
+
+

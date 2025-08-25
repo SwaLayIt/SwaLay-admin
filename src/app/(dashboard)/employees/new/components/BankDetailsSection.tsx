@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -40,14 +40,7 @@ const BankDetailsSection: React.FC<BankDetailsSectionProps> = ({
   });
   const [errors, setErrors] = useState<BankErrors>({});
 
-  // Load existing data if in edit mode
-  useEffect(() => {
-    if (isEditMode && employeeId) {
-      loadBankDetails();
-    }
-  }, [isEditMode, employeeId]);
-
-  const loadBankDetails = async () => {
+  const loadBankDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiGet(`/api/employee/bank-details?employeeId=${employeeId}`) as any;
@@ -68,7 +61,14 @@ const BankDetailsSection: React.FC<BankDetailsSectionProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [employeeId]);
+
+  // Load existing data if in edit mode
+  useEffect(() => {
+    if (isEditMode && employeeId) {
+      loadBankDetails();
+    }
+  }, [isEditMode, employeeId, loadBankDetails]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

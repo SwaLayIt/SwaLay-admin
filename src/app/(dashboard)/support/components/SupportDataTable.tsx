@@ -228,17 +228,17 @@ export function SupportDataTable({
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
     const [globalFilter, setGlobalFilter] = React.useState("");
-    const [statusFilter, setStatusFilter] = React.useState<string>("all");
+    const [priorityFilter, setPriorityFilter] = React.useState<string>("all");
 
     const columns = supportColumns(onViewThread);
 
-    // Filter data based on status filter
+    // Filter data based on priority filter
     const filteredData = React.useMemo(() => {
-        if (statusFilter === "all") {
+        if (priorityFilter === "all") {
             return data;
         }
-        return data.filter((ticket) => ticket.status === statusFilter);
-    }, [data, statusFilter]);
+        return data.filter((ticket) => ticket.priority === priorityFilter);
+    }, [data, priorityFilter]);
 
     const table = useReactTable({
         data: filteredData,
@@ -288,15 +288,15 @@ export function SupportDataTable({
                         onChange={(event) => setGlobalFilter(event.target.value)}
                         className="max-w-sm"
                     />
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                         <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="Filter by status" />
+                            <SelectValue placeholder="Filter by priority" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">All Status</SelectItem>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="in-progress">In Progress</SelectItem>
-                            <SelectItem value="resolved">Resolved</SelectItem>
+                            <SelectItem value="all">All Priority</SelectItem>
+                            <SelectItem value="low">Low</SelectItem>
+                            <SelectItem value="medium">Medium</SelectItem>
+                            <SelectItem value="high">High</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

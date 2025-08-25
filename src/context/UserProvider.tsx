@@ -1,5 +1,5 @@
 'use client' 
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode, useCallback } from 'react';
 import { apiGet } from '@/helpers/axiosRequest';
 import toast from 'react-hot-toast';
 import UserContext from './userContext';
@@ -22,7 +22,7 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | undefined>(undefined);
   const router = useRouter();
 
-  const fetchUserDetails = async () => {
+  const fetchUserDetails = useCallback(async () => {
     try {
       const response:any = await apiGet('/api/admin/userdetails');
       if (response.success) {
@@ -40,11 +40,11 @@ const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       setUser(undefined);
       router.push('/signin');
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     fetchUserDetails();
-  }, []);
+  }, [fetchUserDetails]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

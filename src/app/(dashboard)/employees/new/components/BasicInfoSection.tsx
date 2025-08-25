@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -52,13 +52,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   const [errors, setErrors] = useState<BasicErrors>({});
 
   // Load existing data if in edit mode
-  useEffect(() => {
-    if (isEditMode && employeeId) {
-      loadBasicInfo();
-    }
-  }, [isEditMode, employeeId]);
-
-  const loadBasicInfo = async () => {
+  const loadBasicInfo = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiGet(`/api/employee/basic-info?employeeId=${employeeId}`) as any;
@@ -82,7 +76,13 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [employeeId]);
+
+  useEffect(() => {
+    if (isEditMode && employeeId) {
+      loadBasicInfo();
+    }
+  }, [isEditMode, employeeId, loadBasicInfo]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

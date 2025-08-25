@@ -498,6 +498,7 @@ const AlbumForm: React.FC = () => {
 
                   {coverPreview && (
                     <div className="mt-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={coverPreview} alt="Cover Preview" className="w-40 h-40 object-cover border rounded" />
                     </div>
                   )}

@@ -1,15 +1,9 @@
-"use client";
-
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import useSWR, { mutate } from "swr";
+import React from "react";
+import { api } from "@/lib/apiRequest";
+import SupportPageClient from "./components/SupportPageClient";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import SupportThread from "./components/SupportThread";
-import Link from "next/link";
-import { apiGet } from "@/helpers/axiosRequest";
-import TicketStatsDashboard from "./components/TicketStatsDashboard";
-import { SupportDataTable } from "./components/SupportDataTable";
 
 interface SupportTicket {
   _id: string;
@@ -29,73 +23,49 @@ interface SupportTicket {
   __v: number;
 }
 
-// Create a fetcher function for SWR
-const fetcher = (url: string) =>
-  apiGet(url).then((res: any) => {
-    if (!res.success) throw new Error("Failed to fetch tickets");
-    return res.data;
-  });
+export const dynamic = "force-dynamic";
 
-export default function MyTickets() {
-  const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
+const TicketPage = async () => {
+  
+  try {
+    const apiResponse = await api.get<{ data: SupportTicket[] }>(
+      "/api/support/getAllTickets?status=pending"
+    );
 
-  // SWR data fetching
-  const {
-    data: tickets,
-    error,
-    isLoading,
-  } = useSWR<SupportTicket[]>("/api/support/getAllTickets?status=pending", fetcher, {
-    refreshInterval: 30000, // 30 seconds
-    revalidateOnFocus: true,
-    shouldRetryOnError: true,
-  });
+    const tickets = apiResponse.data || [];
 
-  if (isLoading) {
-    return <div className="p-6">Loading...</div>;
-  }
-
-  if (error) {
-    return <div className="p-6 text-red-500">Error loading tickets</div>;
-  }
-
-  return (
-    <div className="w-full min-h-[80dvh] p-6 bg-white rounded-sm">
-      <div className="flex justify-between items-center mb-8">
-        <div className="space-y-4">
-          <h1 className="text-3xl font-bold">Support Tickets</h1>
-          <p className="text-muted-foreground">
-            Manage and respond to support tickets
-          </p>
+    return <SupportPageClient tickets={tickets} />;
+  } catch (error) {
+    console.error("Error fetching support tickets:", error);
+    
+    return (
+      <div className="w-full min-h-[80dvh] p-6 bg-white rounded-sm">
+        <div className="flex justify-center items-center h-full">
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center space-y-4 text-center">
+                <AlertCircle className="h-12 w-12 text-red-500" />
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold">Failed to Load Support Tickets</h3>
+                  <p className="text-sm text-muted-foreground">
+                    There was an error loading the support tickets. Please try again.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => window.location.reload()} 
+                  variant="outline"
+                  className="mt-4"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Retry
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-        <Link href="/support/create-ticket">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Ticket
-          </Button>
-        </Link>
       </div>
+    );
+  }
+};
 
-      <TicketStatsDashboard 
-        total={tickets?.length || 0}
-        pending={tickets?.filter((t) => t.status === "pending").length || 0}
-        inProgress={tickets?.filter((t) => t.status === "in-progress").length || 0}
-        resolved={tickets?.filter((t) => t.status === "resolved").length || 0}
-      />
-
-
-      <SupportDataTable
-        data={tickets || []}
-        onViewThread={(ticketId) => setSelectedTicket(ticketId)}
-      />
-
-      {selectedTicket && (
-        <SupportThread
-          ticketId={selectedTicket}
-          onClose={() => setSelectedTicket(null)}
-          onUpdate={() => mutate("/api/support/getAllTickets")}
-        />
-      )}
-      
-    </div>
-  );
-}
+export default TicketPage;

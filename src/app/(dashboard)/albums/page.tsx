@@ -70,7 +70,7 @@ const Albums = () => {
     if (labelId && isLoading) {
       fetchAlbums(labelId);
     }
-  }, [labelId]);
+  }, [labelId, isLoading]);
 
   if (isLoading) {
     return <AlbumsLoading />;

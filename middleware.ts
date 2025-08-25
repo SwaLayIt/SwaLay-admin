@@ -22,6 +22,7 @@ export async function middleware(request: NextRequest) {
     customerSupport: ["/", "/albums", "/copyrights", "/labels", "/support"],
     contentDeployment: ["/", "/albums", "/copyrights", "/artists", "/support"],
     ANR: ["/", "/albums", "/marketing", "/artists", "/notifications"],
+    HR: ["/", "/employees"],
   };
 
   // Get the token

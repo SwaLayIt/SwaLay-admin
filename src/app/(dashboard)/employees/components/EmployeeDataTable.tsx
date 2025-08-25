@@ -111,7 +111,7 @@ export const employeeColumns: ColumnDef<Employee>[] = [
     header: "Status",
     cell: ({ row }) => {
       let color = "";
-      let label = row.original.status;
+      const label = row.original.status;
       if (label.toLowerCase() === "active") color = "bg-green-100 text-green-800";
       else if (label.toLowerCase() === "on leave") color = "bg-yellow-100 text-yellow-800";
       else color = "bg-red-100 text-red-800";
@@ -186,10 +186,10 @@ export function EmployeeDataTable({ data }: { data: Employee[] }) {
         <Input
           placeholder="Filter by name..."
           value={
-            (table.getColumn("fullName")?.getFilterValue() as string) ?? ""
+            (table.getColumn("employee")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("fullName")?.setFilterValue(event.target.value)
+            table.getColumn("employee")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

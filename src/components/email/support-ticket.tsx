@@ -68,7 +68,7 @@ export default function SupportTicketEmailTemplate({
               <p><strong>Final Status:</strong> Resolved</p>
             </div>
             <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-              We hope your issue has been resolved to your satisfaction. If you need further assistance, please don't hesitate to create a new ticket.
+              We hope your issue has been resolved to your satisfaction. If you need further assistance, please don&apos;t hesitate to create a new ticket.
             </p>
           </>
         )}

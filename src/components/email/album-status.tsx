@@ -45,10 +45,10 @@ export default function AlbumStatusEmailTemplate({
           {status === "approved" && (
             <>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-                We're excited to share that your album "{albumName}" has been successfully approved by our team!
+                We&apos;re excited to share that your album &quot;{albumName}&quot; has been successfully approved by our team!
               </p>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-                Your songs will be delivered to all platforms shortly and will be live very soon. We can't wait for the world to experience your music.
+                Your songs will be delivered to all platforms shortly and will be live very soon. We can&apos;t wait for the world to experience your music.
               </p>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
                 To give your release the spotlight it deserves, we encourage you to use the Marketing feature on your SwaLay Plus dashboard.
@@ -59,8 +59,8 @@ export default function AlbumStatusEmailTemplate({
           {status === "live" && (
             <>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-                Congratulations! Your album "{albumName}" is now officially live on music platforms.
-                We're thrilled to be part of your musical journey!
+                Congratulations! Your album &quot;{albumName}&quot; is now officially live on music platforms.
+                We&apos;re thrilled to be part of your musical journey!
               </p>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
                 Let the world hear you! 🌍🎶
@@ -71,10 +71,10 @@ export default function AlbumStatusEmailTemplate({
           {status === "rejected" && (
             <>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-                We truly appreciate the time, effort, and creativity you've poured into your album "{albumName}".
+                We truly appreciate the time, effort, and creativity you&apos;ve poured into your album &quot;{albumName}&quot;.
               </p>
               <p style={{ fontSize: "16px", marginBottom: "20px" }}>
-                However, we're sorry to inform you that it was not approved in its current form during our review process.
+                However, we&apos;re sorry to inform you that it was not approved in its current form during our review process.
               </p>
               <div
                 style={{
@@ -112,7 +112,7 @@ export default function AlbumStatusEmailTemplate({
             >
               swalay.care@talantoncore.in
             </a>
-            . We're always here for you.
+            . We&apos;re always here for you.
           </p>
 
           <p style={{ fontSize: "16px", marginBottom: "20px" }}>Best regards,</p>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface MarketingCardProps {
   albumId: string;
@@ -38,7 +39,7 @@ const MarketingCard: React.FC<MarketingCardProps> = ({
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 m-2 w-64">
       <div className="relative h-48 bg-gray-200">
         {!imageError ? (
-          <img
+          <Image
             src={imageSrc}
             alt={albumName}
             className="w-full h-full object-cover"

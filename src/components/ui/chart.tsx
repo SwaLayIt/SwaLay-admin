@@ -66,10 +66,16 @@ const ChartContainer = React.forwardRef<
     </ChartContext.Provider>
   )
 })
+
 ChartContainer.displayName = "Chart"
 
-// Remove PropTypes validation since we're using TypeScript types
-ChartContainer.propTypes = undefined
+// Add prop types validation for ChartContainer
+ChartContainer.propTypes = {
+  id: PropTypes.string,
+  className: PropTypes.string,
+  children: PropTypes.any.isRequired,
+  config: PropTypes.any.isRequired,
+}
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(

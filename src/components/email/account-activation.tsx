@@ -43,6 +43,7 @@ export default function AccountActivationEmailTemplate({
         </ol>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center",  margin: '32px 0' }}>       
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src="https://swalay-music-files.s3.ap-south-1.amazonaws.com/assets/SwaLay+-2.png" 
             alt="Welcome Character"

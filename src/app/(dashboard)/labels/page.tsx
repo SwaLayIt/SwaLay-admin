@@ -17,12 +17,14 @@ import { api } from "@/lib/apiRequest";
 export const dynamic = "force-dynamic";
 
 const Labels = async () => {
+
+  
   const apiResponse = await api.get<{ data: any }>(
     "/api/labels/getLabels"
   );
 
 
-  let Labels = apiResponse.data;
+  const Labels = apiResponse.data;
   
 
   return (

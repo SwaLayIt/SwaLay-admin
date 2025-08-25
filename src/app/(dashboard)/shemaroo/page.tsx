@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import ShemarooAssignModal from "./components/ShemarooAssignModal";
 import { apiGet } from "@/helpers/axiosRequest";
 
-const page = () => {
+const Page = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [users, setUsers] = useState([]);
 
@@ -106,4 +106,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

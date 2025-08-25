@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import useSWR, { mutate } from "swr";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, ArrowLeft } from "lucide-react";
 import SupportThread from "../components/SupportThread";
 import Link from "next/link";
-import { apiGet } from "@/helpers/axiosRequest";
 import { SupportDataTable } from "../components/SupportDataTable";
+import { api } from "@/lib/apiRequest";
+
 
 interface SupportTicket {
   _id: string;
@@ -34,12 +33,6 @@ interface StatusPageProps {
   };
 }
 
-// Create a fetcher function for SWR
-const createFetcher = (status: string) => (url: string) =>
-  apiGet(`${url}?status=${status}`).then((res: any) => {
-    if (!res.success) throw new Error("Failed to fetch tickets");
-    return res.data;
-  });
 
 // Status configuration
 const statusConfig = {
@@ -67,25 +60,32 @@ const statusConfig = {
 };
 
 export default function StatusPage({ params }: StatusPageProps) {
+
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+
   const status = params.status as keyof typeof statusConfig;
   const config = statusConfig[status] || statusConfig.pending;
 
-  // SWR data fetching with status filter
-  const {
-    data: tickets,
-    error,
-    isLoading,
-  } = useSWR<SupportTicket[]>(
-    `/api/support/getAllTickets`,
-    createFetcher(status),
-    {
-      refreshInterval: 30000, // 30 seconds
-      revalidateOnFocus: true,
-      shouldRetryOnError: true,
+  const fetchTicketsData = useCallback(async () => {
+    try {
+      const apiResponse = await api.get<{data: SupportTicket[]}>(`/api/support/getAllTickets?status=${status}`);
+      const tickets = apiResponse.data;
+      console.log("tickets", tickets);
+      setTickets(tickets);
+      setIsLoading(false);
+    } catch (error) {
+      setError("Failed to fetch tickets");
+      setIsLoading(false);
     }
-  );
+  }, [status]);
+
+  useEffect(() => {
+    fetchTicketsData();
+  }, [fetchTicketsData])
+  
 
   if (isLoading) {
     return (
@@ -174,13 +174,14 @@ export default function StatusPage({ params }: StatusPageProps) {
       />
 
       {/* Support Thread Modal */}
-      {selectedTicket && (
+      {/* {selectedTicket && (
         <SupportThread
           ticketId={selectedTicket}
           onClose={() => setSelectedTicket(null)}
           onUpdate={() => mutate(`/api/support/getAllTickets?status=${status}`)}
         />
-      )}
+      )} */}
+
     </div>
   );
 }
