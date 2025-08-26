@@ -67,6 +67,7 @@ const Navbar = () => {
     { path: "/copyrights", name: "Copyrights", icon: "bi-youtube" },
     { path: "/labels", name: "Labels", icon: "bi-people" },
     { path: "/subscription", name: "Subscription", icon: "bi bi-credit-card-2-back-fill" },
+    { path: "/analytics", name: "Analytics", icon:"bi bi-bar-chart"},
     { path: "/artists", name: "Artists", icon: "bi-mic" },
     { path: "/notifications", name: "Notifications", icon: "bi-bell" },
     { path: "/profile", name: "Profile", icon: "bi-person" },
